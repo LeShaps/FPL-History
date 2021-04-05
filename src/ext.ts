@@ -44,10 +44,10 @@ function GetIconAsBase64() {
     let BaseIcon = "data:image/png;base64,";
 
     if (existsSync(path.join(__dirname, "../icons/default.png"))) {
-        BaseIcon += readFileSync(path.join(__dirname, "../icons/default.png"), "base64");
+        return BaseIcon += readFileSync(path.join(__dirname, "../icons/default.png"), "base64");
     }
 
-    return BaseIcon;
+    return "";
 }
 
 function UpdateHistoryPlaylist(playlist: flashpoint.Playlist, game: flashpoint.Game) {
