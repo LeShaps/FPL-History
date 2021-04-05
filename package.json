@@ -1,26 +1,27 @@
 {
-    "name": "historic-infos",
-    "displayName": "Historic",
-    "author": "Paul Gaston",
-    "version": "0.0.1",
+    "name": "history",
+    "displayName": "History",
+    "author": "LeShaps",
+    "version": "0.0.2",
     "launcherVersion": "9.1.0",
     "description": "Let you have an history of the last items you've played on Flashpoint",
     "icon": "icon.png",
     "contributes": {
         "configuration": [
             {
-                "title": "Track Extremes",
+                "title": "History",
                 "properties": {
                     "com.history.track-extreme": {
+                        "title": "Track Extreme Items",
                         "type": "boolean",
-                        "default": false,
+                        "default": true,
                         "description": "I unticked, will not display extreme items in the history"
                     }
                 }
             }
         ]
     },
-    "main": "./dist/history.js",
+    "main": "./dist/ext.js",
     "devDependencies": {
         "typescript": "^4.2.3"
     },
