@@ -6,26 +6,20 @@ var game_history:string[] = [];
 
 export function activate(context: flashpoint.ExtensionContext) {
     
-    flashpoint.games.findPlaylistByName('History')
-    .then((playlist) => {
-        flashpoint.log.debug('Looking for History');
-        if (playlist === undefined) {
-            CreateHistoryPlaylist();
-        }
-    });
-
-    flashpoint.games.onDidLaunchGame(() =>
+    flashpoint.games.onDidLaunchGame((game) =>
     {
         flashpoint.games.findPlaylistByName('History', true)
         .then((playlist) => {
             if (playlist === undefined) {
-                CreateHistoryPlaylist();
+                CreateHistoryPlaylist(game);
+            } else {
+                UpdateHistoryPlaylist(playlist, game);
             }
         })
     });
 }
 
-function CreateHistoryPlaylist() {
+function CreateHistoryPlaylist(game: flashpoint.Game) {
 
     let GamesList: flashpoint.PlaylistGame[] = [];
 
@@ -35,25 +29,44 @@ function CreateHistoryPlaylist() {
         extreme: flashpoint.getExtConfigValue('com.history.track-extreme'),
         title: "History",
         library: "",
-        id: "history-playlist",
+        id: "history-game-playlist",
         icon: GetIconAsBase64(),
         games: GamesList
     };
 
-    try {
-        flashpoint.games.updatePlaylist(HistoryPlaylist);
-        flashpoint.log.debug('Created History playlist');
-    } catch (Exception) {
-        flashpoint.log.debug(Exception.stack);
-    }
+    flashpoint.games.updatePlaylist(HistoryPlaylist)
+    .then((playlist) => {
+        UpdateHistoryPlaylist(playlist, game);
+    });
 }
 
 function GetIconAsBase64() {
-    let BaseIcon = "";
+    let BaseIcon = "data:image/png;base64,";
 
     if (existsSync(path.join(__dirname, "../icons/default.png"))) {
-        BaseIcon = readFileSync(path.join(__dirname, "../icons/default.png"), "base64");
+        BaseIcon += readFileSync(path.join(__dirname, "../icons/default.png"), "base64");
     }
 
     return BaseIcon;
+}
+
+function UpdateHistoryPlaylist(playlist: flashpoint.Playlist, game: flashpoint.Game) {
+
+    if (game.extreme && !flashpoint.getExtConfigValue('com.history.track-extreme')) {
+        return;
+    }
+
+    let CurrentFlashGames = playlist.games;
+
+    CurrentFlashGames.forEach(elem => elem.order += 1);
+    let UpdatedPlaylistGame: flashpoint.PlaylistGame = {
+        game: game,
+        order: CurrentFlashGames.length,
+        notes: "",
+        playlist: playlist
+    };
+
+    CurrentFlashGames.push(UpdatedPlaylistGame);
+    playlist.games = CurrentFlashGames;
+    flashpoint.games.updatePlaylist(playlist);
 }
