@@ -58,6 +58,10 @@ function UpdatePlaylist(playlist: flashpoint.Playlist, game: flashpoint.Game) {
 
     let currentFlashGames = playlist.games;
 
+    if (currentFlashGames[currentFlashGames.length - 1].gameId === game.id) {
+        return;
+    }
+
     let UpdatedPlaylistGames: flashpoint.PlaylistGame = {
         game: game,
         order: currentFlashGames.length,
