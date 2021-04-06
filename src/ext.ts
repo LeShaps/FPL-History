@@ -8,37 +8,69 @@ export function activate(context: flashpoint.ExtensionContext) {
     
     flashpoint.games.onDidLaunchGame((game) =>
     {
-        flashpoint.games.findPlaylistByName('History', true)
-        .then((playlist) => {
-            if (playlist === undefined) {
-                CreateHistoryPlaylist(game);
-            } else {
-                UpdateHistoryPlaylist(playlist, game);
-            }
-        })
+        if (game.library === "theatre") {
+            flashpoint.games.findPlaylist('history-animation-playlist', true)
+            .then((playlist) => {
+                if (playlist === undefined) {
+                    CreateHistoryPlaylist(game, true);
+                } else {
+                    UpdatePlaylist(playlist, game);
+                }
+            })
+        } else {
+            flashpoint.games.findPlaylist('history-game-playlist', true)
+            .then((playlist) => {
+                if (playlist === undefined) {
+                    CreateHistoryPlaylist(game, false);
+                } else {
+                    UpdatePlaylist(playlist, game);
+                }
+            })
+        }
     });
 }
 
-function CreateHistoryPlaylist(game: flashpoint.Game) {
+function CreateHistoryPlaylist(game: flashpoint.Game, animation: boolean) {
 
     let GamesList: flashpoint.PlaylistGame[] = [];
 
     let HistoryPlaylist: flashpoint.Playlist = {
         author: "You!",
-        description: "The last games you've played",
+        description: animation ? "The last animations you've played" : "The last games you've played",
         extreme: flashpoint.getExtConfigValue('com.history.track-extreme'),
         title: "History",
-        library: "",
-        id: "history-game-playlist",
+        library: animation ? "theatre" : "arcade",
+        id: animation ? "history-animation-playlist" : "history-game-playlist",
         icon: GetIconAsBase64(),
         games: GamesList
     };
 
     flashpoint.games.updatePlaylist(HistoryPlaylist)
     .then((playlist) => {
-        UpdateHistoryPlaylist(playlist, game);
+        UpdatePlaylist(playlist, game);
     });
 }
+
+function UpdatePlaylist(playlist: flashpoint.Playlist, game: flashpoint.Game) {
+    if (game.extreme && !flashpoint.getExtConfigValue('com.history.track-extreme')) {
+        return;
+    }
+
+    let currentFlashGames = playlist.games;
+
+    let UpdatedPlaylistGames: flashpoint.PlaylistGame = {
+        game: game,
+        order: currentFlashGames.length,
+        notes: "",
+        playlist: playlist
+    };
+
+    currentFlashGames.push(UpdatedPlaylistGames);
+    playlist.games = currentFlashGames;
+    flashpoint.games.updatePlaylist(playlist);
+}
+
+/* Utils */
 
 function GetIconAsBase64() {
     let BaseIcon = "data:image/png;base64,";
@@ -48,25 +80,4 @@ function GetIconAsBase64() {
     }
 
     return "";
-}
-
-function UpdateHistoryPlaylist(playlist: flashpoint.Playlist, game: flashpoint.Game) {
-
-    if (game.extreme && !flashpoint.getExtConfigValue('com.history.track-extreme')) {
-        return;
-    }
-
-    let CurrentFlashGames = playlist.games;
-
-    CurrentFlashGames.forEach(elem => elem.order += 1);
-    let UpdatedPlaylistGame: flashpoint.PlaylistGame = {
-        game: game,
-        order: CurrentFlashGames.length,
-        notes: "",
-        playlist: playlist
-    };
-
-    CurrentFlashGames.push(UpdatedPlaylistGame);
-    playlist.games = CurrentFlashGames;
-    flashpoint.games.updatePlaylist(playlist);
 }

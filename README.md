@@ -24,12 +24,11 @@ Same as the above
 For now, the extension exist only for Flashpoint 9.0
 
 ### What's the last version of the extension?
-Currently, the extension is in 1.0.0
+Currently, the extension is in 1.1.0
 
 ## What comes next?
 For now, the TODO list is:
 ***
-* Add animations integration
 * Let a configuration choose the maximum number of items in the playlist
 * Let a configuration choose the icon of the playlist
 * Add informations about when you've played the game / the animation
