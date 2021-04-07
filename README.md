@@ -24,7 +24,7 @@ Same as the above
 For now, the extension exist only for Flashpoint 9.0
 
 ### What's the last version of the extension?
-Currently, the extension is in 1.1.0
+Currently, the extension is in 1.2.0
 
 ## What comes next?
 For now, the TODO list is:
